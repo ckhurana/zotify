@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_course_options">
+        <item>@string/pref_course_btech_cs_option</item>
+        <item>@string/pref_course_bcom_hons_1_option</item>
+    </string-array>
+
+    <string-array name="pref_course_values">
+        <item>@string/pref_course_btech_cs_value</item>
+        <item>@string/pref_course_bcom_hons_1_value</item>
+    </string-array>
+
+    <string-array name="pref_notif_options">
+        <item>@string/pref_notif_freq_015</item>
+        <item>@string/pref_notif_freq_1</item>
+        <item>@string/pref_notif_freq_3</item>
+        <item>@string/pref_notif_freq_5</item>
+        <item>@string/pref_notif_freq_12</item>
+        <item>@string/pref_notif_freq_24</item>
+    </string-array>
+
+    <string-array name="pref_notif_values">
+        <item>@string/pref_notif_015</item>
+        <item>@string/pref_notif_1</item>
+        <item>@string/pref_notif_3</item>
+        <item>@string/pref_notif_5</item>
+        <item>@string/pref_notif_12</item>
+        <item>@string/pref_notif_24</item>
+    </string-array>
+
+    <string-array name="pref_tab_options">
+        <item>@string/pref_tab_gen</item>
+        <item>@string/pref_tab_sub</item>
+    </string-array>
+
+    <string-array name="pref_tab_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+</resources>

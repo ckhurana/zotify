@@ -1,0 +1,44 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="pref_notif_freq_015">15 Minutes</string>
+    <string name="pref_notif_freq_1">1 Hour</string>
+    <string name="pref_notif_freq_3">3 Hours</string>
+    <string name="pref_notif_freq_5">5 Hours</string>
+    <string name="pref_notif_freq_12">12 Hours</string>
+    <string name="pref_notif_freq_24">1 Day</string>
+
+    <string name="pref_notif_015">900</string>
+    <string name="pref_notif_1">3600</string>
+    <string name="pref_notif_3">10800</string>
+    <string name="pref_notif_5">18000</string>
+    <string name="pref_notif_12">43200</string>
+    <string name="pref_notif_24">86400</string>
+
+    <string name="pref_tab_gen">General</string>
+    <string name="pref_tab_sub">Subjects</string>
+
+    <string name="pref_tab_gen_v">0</string>
+    <string name="pref_tab_sub_v">1</string>
+
+    <string name="pref_enable_notifications_false">Not Enabled</string>
+    <string name="pref_enable_notifications_true">Enabled</string>
+    <string name="pref_enable_notifications_default">true</string>
+
+    <string name="pref_course_btech_cs_option">B. Tech. (Comp. Sc.)</string>
+    <string name="pref_course_btech_cs_value">computer_science</string>
+    <string name="pref_course_bcom_hons_1_option">B. Com. (Hons) - I Year</string>
+    <string name="pref_course_bcom_hons_1_value">bcom_h_1</string>
+
+    <string name="pref_enable_notifications_key">enable_notifications</string>
+    <string name="pref_enable_notifications_title">Notify Notifications</string>
+
+    <string name="pref_sync_freq_key">sync_frequency</string>
+    <string name="pref_sync_freq_title">Sync Frequency</string>
+
+    <string name="pref_tab_key">default_tab</string>
+    <string name="pref_tab_title">Default Tab</string>
+
+    <string name="pref_course_key">course</string>
+    <string name="pref_course_title">Course</string>
+</resources>

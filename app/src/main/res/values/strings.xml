@@ -1,0 +1,33 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <!--Titles and Names-->
+    <string name="app_name">Zotify</string>
+    <string name="title_activity_details">Details</string>
+    <string name="title_activity_add_notif">Add Notification</string>
+
+    <!--Syncing Data Strings-->
+    <string name="content_authority">com.zuccessful.zotify</string>
+    <string name="sync_account_type">zotify.zuccessful.com</string>
+
+    <!--Menu Items Strings-->
+    <string name="action_settings">Settings</string>
+    <string name="action_reset">Reset Data</string>
+    <string name="action_add_notif">Add Notification</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="delete_item">Delete</string>
+
+    <!--Shared Preferences Files Strings-->
+    <string name="active_app_pref_key">com.zuccessful.zotify.APP_ACTIVE</string>
+    <string name="is_app_active">isActive</string>
+
+    <string name="last_notif_id_key">com.zuccessful.zotify.LAST_ID</string>
+    <string name="last_notif_id_value">lastIdValue</string>
+
+    <!--Utility Strings-->
+    <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>
+    <string name="format_date_type"><xliff:g id="timeStamp">%1$s</xliff:g> - <xliff:g id="type">%2$s</xliff:g></string>
+
+    <!--Misc Strings-->
+    <string name="addnotif_url">http://zuccessful.cu.cc/notify/addnotif</string>
+    <string name="hello_world">Placeholder</string>
+
+</resources>
