@@ -154,7 +154,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         String notifyJsonStr = null;
 
         try {
-            final String NOTIFY_BASE_URL = "http://zuccessful.cu.cc/notify/notifs/index.php?";
+            final String NOTIFY_BASE_URL = getContext().getString(R.string.sync_url);
 
             String courseParam = "course=";
             String selectedCourse = Utilities.getPreferredCourse(getContext());

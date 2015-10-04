@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setCurrentItem(mDefTabIndex);
         }
 
-
         String defCourse = Utilities.getPreferredCourse(this);
         if(! mDefCourse.equals(defCourse)){
             mDefCourse = defCourse;

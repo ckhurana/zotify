@@ -90,7 +90,7 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
         String type = data.getString(COL_NOTIF_TYPE_NAME);
         String timeStr = data.getString(COL_NOTIF_TIME);
 
-        timeStr = Utilities.timeZoneDetailView(timeStr);
+        timeStr = Utilities.timeNormalized(timeStr, false);
 
         titleView.setText(title);
         descView.setText(desc);

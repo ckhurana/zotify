@@ -29,47 +29,56 @@ public class Utilities {
         return priority;
     }
 
-    public static String timeZonedList(String dateTime){
+//    public static String setLocalTimeZone(String timeStr){
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+//        sdf.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+//        try {
+//            Date date = sdf.parse(timeStr);
+//
+//            sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+//            timeStr = sdf.format(date);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//        return timeStr;
+//    }
 
-        Date currDate = new Date();
-        String currDateStr, enteredDate = dateTime;
+    public static String timeNormalized(String inputTimestamp, boolean isListView){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        if(isListView){
+            try {
+                Date currDate = new Date();
 
-        try {
-            Date date = sdf.parse(dateTime);
-            sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+                Date date = sdf.parse(inputTimestamp);
 
-            currDateStr = sdf.format(currDate);
-            enteredDate =  sdf.format(date);
+                sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+                inputTimestamp = sdf.format(date);
+                String currDateStr = sdf.format(currDate);
 
-            if(currDateStr.equals(enteredDate)){
-                sdf = new SimpleDateFormat("hh:mm a", Locale.US);
-                return sdf.format(date);
-            }else {
-                sdf = new SimpleDateFormat("MMM d", Locale.US);
-                return sdf.format(date);
+
+                if(currDateStr.equals(inputTimestamp)){
+                    sdf = new SimpleDateFormat("hh:mm a", Locale.US);
+                    return sdf.format(date);
+                }else {
+                    sdf = new SimpleDateFormat("MMM d", Locale.US);
+                    return sdf.format(date);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } else {
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+            try {
+                Date date = sdf.parse(inputTimestamp);
+                sdf = new SimpleDateFormat("MMM d, HH:mm", Locale.US);
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+                inputTimestamp = sdf.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-        return dateTime;
-
-    }
-
-    public static String timeZoneDetailView(String timeStr){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        try {
-            Date date = sdf.parse(timeStr);
-            sdf = new SimpleDateFormat("MMM d, HH:mm", Locale.ENGLISH);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
-            timeStr = sdf.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return timeStr;
+        return inputTimestamp;
     }
 
     public static void setActiveAppPref(Context context, boolean isActive){

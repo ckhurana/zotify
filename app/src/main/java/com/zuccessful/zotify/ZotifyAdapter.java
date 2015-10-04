@@ -34,7 +34,7 @@ public class ZotifyAdapter extends CursorAdapter {
         String typeName = cursor.getString(GeneralFragment.COL_NOTIF_TYPE_NAME);
         String timeStamp = cursor.getString(GeneralFragment.COL_NOTIF_TIME);
 
-        String time_type = String.format(context.getString(R.string.format_date_type), Utilities.timeZonedList(timeStamp), typeName);
+        String time_type = String.format(context.getString(R.string.format_date_type), Utilities.timeNormalized(timeStamp, true), typeName);
 
         String priority = String.valueOf(Utilities.getPriorityString(priorityCode).charAt(0)).toUpperCase();
 
