@@ -82,26 +82,26 @@ public class Utilities {
     }
 
     public static void setActiveAppPref(Context context, boolean isActive){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.active_app_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putBoolean(context.getString(R.string.is_app_active), isActive);
+        editor.putBoolean(context.getString(R.string.is_app_foreground), isActive);
         editor.apply();
     }
 
     public static boolean getActiveAppPref(Context context){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.active_app_pref_key), Context.MODE_PRIVATE);
-        return sp.getBoolean(context.getString(R.string.is_app_active), false);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getBoolean(context.getString(R.string.is_app_foreground), false);
     }
 
     public static void setLastNotifIdPref(Context context, long id){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.last_notif_id_key), Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putLong(context.getString(R.string.last_notif_id_value), id);
+        editor.putLong(context.getString(R.string.last_synced_notif), id);
         editor.apply();
     }
     public static long getLastNotifIdPref(Context context){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.last_notif_id_key), Context.MODE_PRIVATE);
-        return sp.getLong(context.getString(R.string.last_notif_id_value), 0);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getLong(context.getString(R.string.last_synced_notif), 0);
     }
 
     public static String getPreferredFreq(Context context) {

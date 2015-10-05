@@ -16,11 +16,9 @@
     <string name="delete_item">Delete</string>
 
     <!--Shared Preferences Files Strings-->
-    <string name="active_app_pref_key">com.zuccessful.zotify.APP_ACTIVE</string>
-    <string name="is_app_active">isActive</string>
-
-    <string name="last_notif_id_key">com.zuccessful.zotify.LAST_ID</string>
-    <string name="last_notif_id_value">lastIdValue</string>
+    <string name="utilities_pref_key">com.zuccessful.zotify.UTILITIES_PREF</string>
+    <string name="is_app_foreground">isForeground</string>
+    <string name="last_synced_notif">lastSyncedNotif</string>
 
     <!--Utility Strings-->
     <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>
