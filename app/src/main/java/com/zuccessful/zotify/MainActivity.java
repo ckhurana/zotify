@@ -97,12 +97,6 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
 
-//        int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
-//        if (mDefTabIndex != defTab) {
-//            mDefTabIndex = defTab;
-//            viewPager.setCurrentItem(mDefTabIndex);
-//        }
-
         String defCourse = Utilities.getPreferredCourse(this);
         if(! mDefCourse.equals(defCourse)){
             mDefCourse = defCourse;
