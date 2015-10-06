@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -49,15 +50,6 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        if(savedInstanceState != null){
-            viewPager.setCurrentItem(savedInstanceState.getInt("tabIndex"));
-        } else {
-            int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
-            if (mDefTabIndex != defTab) {
-                mDefTabIndex = defTab;
-                viewPager.setCurrentItem(mDefTabIndex);
-            }
-        }
 
         onFirstLaunch();
 
@@ -97,6 +89,12 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
 
+        int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
+        if (mDefTabIndex != defTab) {
+            mDefTabIndex = defTab;
+            viewPager.setCurrentItem(mDefTabIndex);
+        }
+
         String defCourse = Utilities.getPreferredCourse(this);
         if(! mDefCourse.equals(defCourse)){
             mDefCourse = defCourse;
@@ -116,6 +114,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("tabIndex", viewPager.getCurrentItem());
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        viewPager.setCurrentItem(savedInstanceState.getInt("tabIndex"));
     }
 
     @Override
