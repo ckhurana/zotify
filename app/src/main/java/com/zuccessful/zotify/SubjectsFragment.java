@@ -69,7 +69,7 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mZotifyAdapter.swapCursor(null);
+        //mZotifyAdapter.swapCursor(null);
     }
 }
 

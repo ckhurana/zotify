@@ -101,7 +101,6 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 
     @Override
@@ -118,11 +117,10 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
 
             final Uri uri = getActivity().getIntent().getData();
 
-
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
 
             alert.setTitle("Delete");
-            alert.setMessage("Do you want delete this item?");
+            alert.setMessage("Do you want delete this notification?");
             alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -137,7 +135,6 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
                 }
             });
             alert.show();
-
 
             return true;
         }

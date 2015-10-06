@@ -11,7 +11,7 @@ import com.zuccessful.zotify.sync.ZotifySyncAdapter;
  */
 public class ZotifyDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "zotify.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static Context mContext;
 
     public ZotifyDbHelper(Context context) {

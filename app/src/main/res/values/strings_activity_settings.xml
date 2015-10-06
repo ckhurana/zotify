@@ -27,6 +27,7 @@
 
     <string name="pref_course_btech_cs_option">B. Tech. (Comp. Sc.)</string>
     <string name="pref_course_btech_cs_value">btech_cs</string>
+    <!--<string name="pref_course_btech_cs_value">computer_science</string>-->
     <string name="pref_course_bcom_hons_1_option">B. Com. (Hons) - I Year</string>
     <string name="pref_course_bcom_hons_1_value">bcom_h_1</string>
 

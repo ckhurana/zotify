@@ -104,6 +104,17 @@ public class Utilities {
         return sp.getLong(context.getString(R.string.last_synced_notif), 0);
     }
 
+    public static void setFirstLaunchPref(Context context, boolean isFirst){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(context.getString(R.string.is_first_launch), isFirst);
+        editor.apply();
+    }
+    public static boolean getFirstLaunchPref(Context context){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getBoolean(context.getString(R.string.is_first_launch), true);
+    }
+
     public static String getPreferredFreq(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(context.getString(R.string.pref_sync_freq_key),

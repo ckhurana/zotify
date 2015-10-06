@@ -1,11 +1,16 @@
 package com.zuccessful.zotify;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -44,7 +49,17 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        viewPager.setCurrentItem(mDefTabIndex);
+        if(savedInstanceState != null){
+            viewPager.setCurrentItem(savedInstanceState.getInt("tabIndex"));
+        } else {
+            int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
+            if (mDefTabIndex != defTab) {
+                mDefTabIndex = defTab;
+                viewPager.setCurrentItem(mDefTabIndex);
+            }
+        }
+
+        onFirstLaunch();
 
         mDefCourse = Utilities.getPreferredCourse(this);
 
@@ -55,13 +70,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Utilities.setActiveAppPref(this, true);
+        clearNotifs();
         onPreferenceChanged();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Utilities.setActiveAppPref(this, false);
+    public void onFirstLaunch(){
+        if(Utilities.getFirstLaunchPref(this)){
+            Utilities.setFirstLaunchPref(this, false);
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            sp.edit().putString(getString(R.string.pref_course_key), getString(R.string.pref_course_btech_cs_value)).apply();
+            resetData();
+        }
+    }
+
+    public void clearNotifs(){
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(ZotifySyncAdapter.ZOTIFY_NOTIFICATION_ID);
     }
 
     public void onPreferenceChanged() {
@@ -73,11 +97,11 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
 
-        int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
-        if (mDefTabIndex != defTab) {
-            mDefTabIndex = defTab;
-            viewPager.setCurrentItem(mDefTabIndex);
-        }
+//        int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
+//        if (mDefTabIndex != defTab) {
+//            mDefTabIndex = defTab;
+//            viewPager.setCurrentItem(mDefTabIndex);
+//        }
 
         String defCourse = Utilities.getPreferredCourse(this);
         if(! mDefCourse.equals(defCourse)){
@@ -86,6 +110,24 @@ public class MainActivity extends AppCompatActivity {
             Utilities.setLastNotifIdPref(this, 0);
             ZotifySyncAdapter.syncImmediately(this);
         }
+    }
+
+    public void resetData(){
+        getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+        Utilities.setLastNotifIdPref(this, 0);
+        ZotifySyncAdapter.syncImmediately(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("tabIndex", viewPager.getCurrentItem());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Utilities.setActiveAppPref(this, false);
     }
 
     @Override
@@ -111,9 +153,7 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
         if (id == R.id.action_reset) {
-            getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
-            Utilities.setLastNotifIdPref(this, 0);
-            ZotifySyncAdapter.syncImmediately(this);
+            resetData();
         }
 
         return super.onOptionsItemSelected(item);

@@ -84,6 +84,6 @@ public class GeneralFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mZotifyAdapter.swapCursor(null);
+        //mZotifyAdapter.swapCursor(null);
     }
 }

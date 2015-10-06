@@ -41,7 +41,7 @@ import java.util.Vector;
  */
 public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String LOG_TAG = ZotifySyncAdapter.class.getSimpleName();
-    private static final int ZOTIFY_NOTIFICATION_ID = 3105;
+    public static final int ZOTIFY_NOTIFICATION_ID = 3105;
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
     public static int SYNC_INTERVAL = 60 * 180;
@@ -303,6 +303,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(ZOTIFY_NOTIFICATION_ID, mBuilder.build());
+
         }
     }
 }

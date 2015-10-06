@@ -17,8 +17,10 @@
 
     <!--Shared Preferences Files Strings-->
     <string name="utilities_pref_key">com.zuccessful.zotify.UTILITIES_PREF</string>
+
     <string name="is_app_foreground">isForeground</string>
     <string name="last_synced_notif">lastSyncedNotif</string>
+    <string name="is_first_launch">isFirstLaunch</string>
 
     <!--Utility Strings-->
     <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>
