@@ -222,6 +222,10 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             JSONObject zotifyJson = new JSONObject(zotifyJsonStr);
+
+            //Check server msgs for database
+            successCodeChanged(zotifyJson.getLong(ZOTIFY_SUCCESS));
+
             JSONArray notificationsArray = zotifyJson.getJSONArray(ZOTIFY_NOTIFICATIONS);
 
             Vector<ContentValues> cVector = new Vector<ContentValues>(notificationsArray.length());
@@ -271,6 +275,22 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
             Log.d(LOG_TAG, "Notifications Sync completed, " + inserted + " successful inserts.");
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void successCodeChanged(long code){
+        Log.i(LOG_TAG, "Success code from Server: " + code);
+        Context context = getContext();
+        long savedCode = Utilities.getSuccessCodePref(context);
+
+        if(savedCode != code){
+            Utilities.setSuccessCodePref(context, code);
+            if(code == 101){
+                Log.i(LOG_TAG, "Reset database on Server's Request");
+                context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+                Utilities.setLastNotifIdPref(context, 0);
+                syncImmediately(context);
+            }
         }
     }
 

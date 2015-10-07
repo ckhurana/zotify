@@ -21,6 +21,7 @@
     <string name="is_app_foreground">isForeground</string>
     <string name="last_synced_notif">lastSyncedNotif</string>
     <string name="is_first_launch">isFirstLaunch</string>
+    <string name="success_code_sp">successCode</string>
 
     <!--Utility Strings-->
     <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>

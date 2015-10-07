@@ -29,20 +29,6 @@ public class Utilities {
         return priority;
     }
 
-//    public static String setLocalTimeZone(String timeStr){
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-//        sdf.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-//        try {
-//            Date date = sdf.parse(timeStr);
-//
-//            sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
-//            timeStr = sdf.format(date);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        return timeStr;
-//    }
-
     public static String timeNormalized(String inputTimestamp, boolean isListView){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         if(isListView){
@@ -81,6 +67,7 @@ public class Utilities {
         return inputTimestamp;
     }
 
+
     public static void setActiveAppPref(Context context, boolean isActive){
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -114,6 +101,20 @@ public class Utilities {
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         return sp.getBoolean(context.getString(R.string.is_first_launch), true);
     }
+
+    public static void setSuccessCodePref(Context context, long code){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong(context.getString(R.string.success_code_sp), code);
+        editor.apply();
+    }
+    public static long getSuccessCodePref(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getLong(context.getString(R.string.success_code_sp), 0);
+    }
+
+
+    // --------- Setting's Default Shared Preferences ----------
 
     public static String getPreferredFreq(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
