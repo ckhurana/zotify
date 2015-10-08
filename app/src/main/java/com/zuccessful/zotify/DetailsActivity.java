@@ -42,7 +42,6 @@ public class DetailsActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
-//            supportFinishAfterTransition();
         }
         return super.onOptionsItemSelected(item);
     }
