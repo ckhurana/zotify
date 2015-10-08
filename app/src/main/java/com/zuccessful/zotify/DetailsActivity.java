@@ -42,14 +42,8 @@ public class DetailsActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
+//            supportFinishAfterTransition();
         }
-
-//        if (id == R.id.delete_item) {
-//            getContentResolver().delete(getIntent().getData(), null, null);
-//            NavUtils.navigateUpFromSameTask(this);
-//            return true;
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 }

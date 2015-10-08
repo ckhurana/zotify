@@ -102,15 +102,15 @@ public class Utilities {
         return sp.getBoolean(context.getString(R.string.is_first_launch), true);
     }
 
-    public static void setSuccessCodePref(Context context, long code){
+    public static void setSuccessCodePref(Context context, String code){
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putLong(context.getString(R.string.success_code_sp), code);
+        editor.putString(context.getString(R.string.success_code_sp), code);
         editor.apply();
     }
-    public static long getSuccessCodePref(Context context) {
+    public static String getSuccessCodePref(Context context) {
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
-        return sp.getLong(context.getString(R.string.success_code_sp), 0);
+        return sp.getString(context.getString(R.string.success_code_sp), "1");
     }
 
 

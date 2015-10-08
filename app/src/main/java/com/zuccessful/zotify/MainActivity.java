@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static int mDefTabIndex = 0;
     private static String mDefCourse;
+    public static boolean isReCreated = false;         //for setting up correct tab
     Toolbar toolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mDefCourse = Utilities.getPreferredCourse(this);
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
@@ -53,9 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
         onFirstLaunch();
 
-        mDefCourse = Utilities.getPreferredCourse(this);
-
         ZotifySyncAdapter.initializeSyncAdapter(this);
+
     }
 
     @Override
@@ -89,11 +92,16 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
 
-        int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
-        if (mDefTabIndex != defTab) {
-            mDefTabIndex = defTab;
-            viewPager.setCurrentItem(mDefTabIndex);
+
+        if(!isReCreated){
+            int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
+            if (mDefTabIndex != defTab) {
+                mDefTabIndex = defTab;
+            }
+            isReCreated = true;
         }
+        viewPager.setCurrentItem(mDefTabIndex);
+
 
         String defCourse = Utilities.getPreferredCourse(this);
         if(! mDefCourse.equals(defCourse)){
@@ -112,14 +120,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt("tabIndex", viewPager.getCurrentItem());
+        mDefTabIndex = viewPager.getCurrentItem();
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        viewPager.setCurrentItem(savedInstanceState.getInt("tabIndex"));
     }
 
     @Override

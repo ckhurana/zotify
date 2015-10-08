@@ -21,7 +21,7 @@
     <string name="is_app_foreground">isForeground</string>
     <string name="last_synced_notif">lastSyncedNotif</string>
     <string name="is_first_launch">isFirstLaunch</string>
-    <string name="success_code_sp">successCode</string>
+    <string name="success_code_sp">savedSuccessCode</string>
 
     <!--Utility Strings-->
     <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>
@@ -30,6 +30,9 @@
     <!--Misc Strings-->
     <string name="sync_url">"http://zuccessful.com/zotify/rc/notifications.php?</string>
     <string name="addnotif_url">http://zuccessful.com/zotify/rc/addnotif.php</string>
+
+    <string name="success_reset_code">101</string>
+    <string name="fail_reset_code">001</string>
 
     <string name="hello_world">Hello World!</string>
 

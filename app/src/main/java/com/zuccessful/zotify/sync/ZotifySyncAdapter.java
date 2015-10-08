@@ -168,6 +168,8 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
+            urlConnection.setConnectTimeout(5000);
+            urlConnection.setReadTimeout(10000);
             urlConnection.connect();
 
             InputStream inputStream = urlConnection.getInputStream();
@@ -224,7 +226,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
             JSONObject zotifyJson = new JSONObject(zotifyJsonStr);
 
             //Check server msgs for database
-            successCodeChanged(zotifyJson.getLong(ZOTIFY_SUCCESS));
+            successCodeChanged(zotifyJson.getString(ZOTIFY_SUCCESS));
 
             JSONArray notificationsArray = zotifyJson.getJSONArray(ZOTIFY_NOTIFICATIONS);
 
@@ -236,7 +238,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
                 long id = notificationObject.getInt(ZOTIFY_ID);
 
-                if(id > lastScannedId)
+                if (id > lastScannedId)
                     lastScannedId = id;
 
                 String course = notificationObject.getString(ZOTIFY_COURSE);
@@ -278,14 +280,21 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private void successCodeChanged(long code){
+    private void successCodeChanged(String code) {
         Log.i(LOG_TAG, "Success code from Server: " + code);
         Context context = getContext();
-        long savedCode = Utilities.getSuccessCodePref(context);
+        String savedCode = Utilities.getSuccessCodePref(context);
 
-        if(savedCode != code){
-            Utilities.setSuccessCodePref(context, code);
-            if(code == 101){
+        if (savedCode != code) {
+            if (savedCode.equals(context.getString(R.string.fail_reset_code)) && code.equals("1")) {
+                Utilities.setSuccessCodePref(context, context.getString(R.string.success_reset_code));
+            } else {
+                Utilities.setSuccessCodePref(context, code);
+            }
+
+            if (!(savedCode.equals(context.getString(R.string.success_reset_code)) || savedCode.equals(context.getString(R.string.fail_reset_code))) &&
+                    (code.equals(context.getString(R.string.success_reset_code))
+                            || code.equals(context.getString(R.string.fail_reset_code)))) {
                 Log.i(LOG_TAG, "Reset database on Server's Request");
                 context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
                 Utilities.setLastNotifIdPref(context, 0);

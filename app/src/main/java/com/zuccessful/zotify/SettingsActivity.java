@@ -6,6 +6,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -49,7 +50,6 @@ public class SettingsActivity extends PreferenceActivity
             }
         });
     }
-
 
     /**
      * Attaches a listener so the summary is always updated with the preference value.
