@@ -119,14 +119,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        mDefTabIndex = viewPager.getCurrentItem();
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
+        mDefTabIndex = viewPager.getCurrentItem();
         Utilities.setActiveAppPref(this, false);
     }
 

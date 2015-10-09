@@ -168,8 +168,8 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
-            urlConnection.setConnectTimeout(5000);
-            urlConnection.setReadTimeout(10000);
+//            urlConnection.setConnectTimeout(5000);
+//            urlConnection.setReadTimeout(10000);
             urlConnection.connect();
 
             InputStream inputStream = urlConnection.getInputStream();
@@ -215,6 +215,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         final String ZOTIFY_COURSE = "course";
         final String ZOTIFY_TYPE = "type";
         final String ZOTIFY_TYPE_NAME = "type_name";
+        final String ZOTIFY_AUTHOR = "author";
         final String ZOTIFY_TITLE = "title";
         final String ZOTIFY_DESCRIPTION = "description";
         final String ZOTIFY_PRIORITY = "priority";
@@ -244,6 +245,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 String course = notificationObject.getString(ZOTIFY_COURSE);
                 String type = notificationObject.getString(ZOTIFY_TYPE);
                 String type_name = notificationObject.getString(ZOTIFY_TYPE_NAME);
+                String author = notificationObject.getString(ZOTIFY_AUTHOR);
                 String title = notificationObject.getString(ZOTIFY_TITLE);
                 String description = notificationObject.getString(ZOTIFY_DESCRIPTION);
                 String priority = notificationObject.getString(ZOTIFY_PRIORITY);
@@ -253,6 +255,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_COURSE, course);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_TYPE, type);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_TYPE_NAME, type_name);
+                values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_AUTHOR, author);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_TITLE, title);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_DESC, description);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_PRIORITY, priority);

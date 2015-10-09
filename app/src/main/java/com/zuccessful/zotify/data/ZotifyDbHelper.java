@@ -11,7 +11,7 @@ import com.zuccessful.zotify.sync.ZotifySyncAdapter;
  */
 public class ZotifyDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "zotify.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static Context mContext;
 
     public ZotifyDbHelper(Context context) {
@@ -26,6 +26,7 @@ public class ZotifyDbHelper extends SQLiteOpenHelper {
                 NotificationEntry.COLUMN_NOTIF_COURSE + " TEXT NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_TYPE + " TEXT NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_TYPE_NAME + " VARCHAR(100) NOT NULL," +
+                NotificationEntry.COLUMN_NOTIF_AUTHOR + " VARCHAR(30) NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_TITLE + " TEXT NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_DESC + " TEXT NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_PRIORITY + " CHAR NOT NULL," +

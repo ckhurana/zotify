@@ -30,6 +30,7 @@ public class ZotifyContract {
         public static final String COLUMN_NOTIF_COURSE = "course";
         public static final String COLUMN_NOTIF_TYPE = "type";
         public static final String COLUMN_NOTIF_TYPE_NAME = "type_name";
+        public static final String COLUMN_NOTIF_AUTHOR = "author";
         public static final String COLUMN_NOTIF_PRIORITY = "priority";
         public static final String COLUMN_NOTIF_TITLE = "title";
         public static final String COLUMN_NOTIF_DESC = "description";

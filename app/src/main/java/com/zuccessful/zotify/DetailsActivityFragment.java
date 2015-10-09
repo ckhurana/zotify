@@ -29,13 +29,15 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
     static final int COL_NOTIF_PRIORITY = 3;
     static final int COL_NOTIF_DESC = 4;
     static final int COL_NOTIF_TIME = 5;
+    static final int COL_NOTIF_AUTHOR = 6;
     static final String[] DETAILS_COLUMNS = {
             ZotifyContract.NotificationEntry._ID,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_TYPE_NAME,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_TITLE,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_PRIORITY,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_DESC,
-            ZotifyContract.NotificationEntry.COLUMN_NOTIF_TIME
+            ZotifyContract.NotificationEntry.COLUMN_NOTIF_TIME,
+            ZotifyContract.NotificationEntry.COLUMN_NOTIF_AUTHOR
     };
     private static final int DETAIL_LOADER = 0;
 
@@ -83,12 +85,14 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
         TextView priorityView = (TextView) getView().findViewById(R.id.priority_text_view);
         TextView descView = (TextView) getView().findViewById(R.id.desc_view);
         TextView timeView = (TextView) getView().findViewById(R.id.time_text);
+        TextView authorView = (TextView) getView().findViewById(R.id.author_text);
 
         String title = data.getString(COL_NOTIF_TITLE);
         String desc = data.getString(COL_NOTIF_DESC);
         String priority = Utilities.getPriorityString(data.getString(COL_NOTIF_PRIORITY));
         String type = data.getString(COL_NOTIF_TYPE_NAME);
         String timeStr = data.getString(COL_NOTIF_TIME);
+        String author = data.getString(COL_NOTIF_AUTHOR);
 
         timeStr = Utilities.timeNormalized(timeStr, false);
 
@@ -97,6 +101,7 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
         priorityView.setText(priority);
         typeView.setText(type);
         timeView.setText(timeStr);
+        authorView.setText(author);
     }
 
     @Override
