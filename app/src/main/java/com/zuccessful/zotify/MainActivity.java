@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.zuccessful.zotify.data.ZotifyContract;
 import com.zuccessful.zotify.sync.ZotifySyncAdapter;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
             sp.edit().putString(getString(R.string.pref_course_key), getString(R.string.pref_course_btech_cs_value)).apply();
             resetData();
+
+            Toast.makeText(MainActivity.this, "Select your Preferred Course from the App Settings", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -3,6 +3,8 @@ package com.zuccessful.zotify.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.zuccessful.zotify.Utilities;
 import com.zuccessful.zotify.data.ZotifyContract.NotificationEntry;
 import com.zuccessful.zotify.sync.ZotifySyncAdapter;
 
@@ -39,6 +41,7 @@ public class ZotifyDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + NotificationEntry.TABLE_NAME + ";");
         onCreate(db);
+        Utilities.setLastNotifIdPref(mContext, 0);
         ZotifySyncAdapter.syncImmediately(mContext);
     }
 }
