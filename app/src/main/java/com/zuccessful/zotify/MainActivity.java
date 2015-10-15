@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.zuccessful.zotify.data.ZotifyContract;
+import com.zuccessful.zotify.sync.ZotifyMiscSyncAdapter;
 import com.zuccessful.zotify.sync.ZotifySyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -117,8 +118,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void resetData(){
         getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+        getContentResolver().delete(ZotifyContract.CoursesEntry.CONTENT_URI, null, null);
         Utilities.setLastNotifIdPref(this, 0);
         ZotifySyncAdapter.syncImmediately(this);
+        ZotifyMiscSyncAdapter.syncImmediately(this);
     }
 
     @Override

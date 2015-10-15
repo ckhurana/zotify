@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.zuccessful.zotify.Utilities;
 
@@ -18,6 +20,8 @@ public class ZotifyProvider extends ContentProvider {
     static final int ZOTIFY_GENERAL = 101;
     static final int ZOTIFY_SUBJECTS = 102;
     static final int ZOTIFY_WITH_ID = 103;
+    static final int ZOTIFY_COURSES = 104;
+    static final int ZOTIFY_COURSE_WITH_ID = 105;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private ZotifyDbHelper mOpenHelper;
@@ -30,6 +34,8 @@ public class ZotifyProvider extends ContentProvider {
         matcher.addURI(authority, ZotifyContract.PATH_GENERAL, ZOTIFY_GENERAL);
         matcher.addURI(authority, ZotifyContract.PATH_SUBJECTS, ZOTIFY_SUBJECTS);
         matcher.addURI(authority, ZotifyContract.PATH_ZOTIFY + "/#", ZOTIFY_WITH_ID);
+        matcher.addURI(authority, ZotifyContract.PATH_ZOTIFY_COURSES, ZOTIFY_COURSES);
+        matcher.addURI(authority, ZotifyContract.PATH_ZOTIFY_COURSES + "/#", ZOTIFY_COURSE_WITH_ID);
 
         return matcher;
     }
@@ -98,6 +104,27 @@ public class ZotifyProvider extends ContentProvider {
                 break;
             }
 
+            case ZOTIFY_COURSES:
+                retCursor = db.query(ZotifyContract.CoursesEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        ZotifyContract.CoursesEntry._ID);
+                break;
+
+            case ZOTIFY_COURSE_WITH_ID:
+                String id= uri.getPathSegments().get(1);
+                retCursor = db.query(ZotifyContract.CoursesEntry.TABLE_NAME,
+                        projection,
+                        ZotifyContract.CoursesEntry._ID,
+                        new String[]{id},
+                        null,
+                        null,
+                        ZotifyContract.CoursesEntry._ID);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
         }
@@ -117,6 +144,10 @@ public class ZotifyProvider extends ContentProvider {
                 return ZotifyContract.NotificationEntry.CONTENT_TYPE;
             case ZOTIFY_WITH_ID:
                 return ZotifyContract.NotificationEntry.CONTENT_ITEM_TYPE;
+            case ZOTIFY_COURSES:
+                return ZotifyContract.CoursesEntry.CONTENT_TYPE;
+            case ZOTIFY_COURSE_WITH_ID:
+                return ZotifyContract.CoursesEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -135,8 +166,19 @@ public class ZotifyProvider extends ContentProvider {
                     returnUri = ZotifyContract.NotificationEntry.buildNotificationUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
-                break;
+
             }
+            break;
+
+            case ZOTIFY_COURSES: {
+                long _id = db.insert(ZotifyContract.CoursesEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = ZotifyContract.CoursesEntry.buildCoursesUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+            }
+            break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -166,6 +208,23 @@ public class ZotifyProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
+
+            case ZOTIFY_COURSES:
+                db.beginTransaction();
+                returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(ZotifyContract.CoursesEntry.TABLE_NAME, null, value);
+                        if(_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                return returnCount;
+
             default:
                 return super.bulkInsert(uri, values);
         }
@@ -197,6 +256,13 @@ public class ZotifyProvider extends ContentProvider {
             }
             break;
 
+            case ZOTIFY_COURSES: {
+                rowsDeleted = db.delete(ZotifyContract.CoursesEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+            }
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -209,18 +275,25 @@ public class ZotifyProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int rowsUpdated;
 
         switch (sUriMatcher.match(uri)) {
-            case ZOTIFY: {
+            case ZOTIFY:
                 rowsUpdated = db.update(ZotifyContract.NotificationEntry.TABLE_NAME,
                         values,
                         selection,
                         selectionArgs);
                 break;
-            }
+
+            case ZOTIFY_COURSES:
+                rowsUpdated = db.update(ZotifyContract.CoursesEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Failed to update rows from " + uri);
         }

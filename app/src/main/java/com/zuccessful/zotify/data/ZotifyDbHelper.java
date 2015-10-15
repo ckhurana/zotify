@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.zuccessful.zotify.Utilities;
 import com.zuccessful.zotify.data.ZotifyContract.NotificationEntry;
+import com.zuccessful.zotify.data.ZotifyContract.CoursesEntry;
 import com.zuccessful.zotify.sync.ZotifySyncAdapter;
 
 /**
@@ -23,7 +24,7 @@ public class ZotifyDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query = "CREATE TABLE " + NotificationEntry.TABLE_NAME + " (" +
+        String queryNotifications = "CREATE TABLE " + NotificationEntry.TABLE_NAME + " (" +
                 NotificationEntry._ID + " INTEGER PRIMARY KEY," +
                 NotificationEntry.COLUMN_NOTIF_COURSE + " TEXT NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_TYPE + " TEXT NOT NULL," +
@@ -34,14 +35,23 @@ public class ZotifyDbHelper extends SQLiteOpenHelper {
                 NotificationEntry.COLUMN_NOTIF_PRIORITY + " CHAR NOT NULL," +
                 NotificationEntry.COLUMN_NOTIF_TIME + " TIME NOT NULL" +
                 ");";
-        db.execSQL(query);
+
+        String queryCourses = "CREATE TABLE " + CoursesEntry.TABLE_NAME + " (" +
+                CoursesEntry._ID + " INTEGER PRIMARY KEY," +
+                NotificationEntry.COLUMN_NOTIF_TYPE + " TEXT NOT NULL," +
+                CoursesEntry.COLUMN_COURSE_CODE + " VARCHAR(100) NOT NULL," +
+                CoursesEntry.COLUMN_COURSE_NAME + " VARCHAR(100) NOT NULL," +
+                ");";
+        db.execSQL(queryNotifications);
+        db.execSQL(queryCourses);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + NotificationEntry.TABLE_NAME + ";");
-        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS " + CoursesEntry.TABLE_NAME + ";");
         Utilities.setLastNotifIdPref(mContext, 0);
+        onCreate(db);
         ZotifySyncAdapter.syncImmediately(mContext);
     }
 }

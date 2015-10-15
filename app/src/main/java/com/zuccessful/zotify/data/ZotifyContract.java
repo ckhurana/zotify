@@ -13,6 +13,7 @@ public class ZotifyContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_ZOTIFY = "zotify";
+    public static final String PATH_ZOTIFY_COURSES = "courses";
     public static final String GENERAL = "general";
     public static final String SUBJECTS = "subjects";
     public static final String PATH_GENERAL = PATH_ZOTIFY + "/" + GENERAL;
@@ -41,6 +42,25 @@ public class ZotifyContract {
         }
 
         public static Uri buildNotifyUriWithId(long id){
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+    }
+
+    public static final class CoursesEntry implements BaseColumns {
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ZOTIFY;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ZOTIFY;
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_ZOTIFY_COURSES).build();
+
+        public static final String TABLE_NAME = "courses";
+        public static final String COLUMN_COURSE_CODE = "course_code";
+        public static final String COLUMN_COURSE_NAME = "course_name";
+
+        public static Uri buildCoursesUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildCoursesUriWithId(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
         }
     }
