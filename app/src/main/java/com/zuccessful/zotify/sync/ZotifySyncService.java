@@ -10,20 +10,20 @@ import android.util.Log;
  */
 public class ZotifySyncService extends Service {
     private static final Object sSyncAdapterLock = new Object();
-    private static ZotifySyncAdapter sNotifySyncAdapter = null;
+    private static ZotifySyncAdapter sZotifySyncAdapter = null;
 
     @Override
     public void onCreate() {
         Log.d("NotifySync", "onCreate - ZotifySyncService");
         synchronized (sSyncAdapterLock) {
-            if (sNotifySyncAdapter == null) {
-                sNotifySyncAdapter = new ZotifySyncAdapter(getApplicationContext(), true);
+            if (sZotifySyncAdapter == null) {
+                sZotifySyncAdapter = new ZotifySyncAdapter(getApplicationContext(), true);
             }
         }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return sNotifySyncAdapter.getSyncAdapterBinder();
+        return sZotifySyncAdapter.getSyncAdapterBinder();
     }
 }
