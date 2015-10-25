@@ -14,7 +14,7 @@ import com.zuccessful.zotify.sync.ZotifySyncAdapter;
  */
 public class ZotifyDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "zotify.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static Context mContext;
 
     public ZotifyDbHelper(Context context) {
@@ -38,9 +38,8 @@ public class ZotifyDbHelper extends SQLiteOpenHelper {
 
         String queryCourses = "CREATE TABLE " + CoursesEntry.TABLE_NAME + " (" +
                 CoursesEntry._ID + " INTEGER PRIMARY KEY," +
-                NotificationEntry.COLUMN_NOTIF_TYPE + " TEXT NOT NULL," +
                 CoursesEntry.COLUMN_COURSE_CODE + " VARCHAR(100) NOT NULL," +
-                CoursesEntry.COLUMN_COURSE_NAME + " VARCHAR(100) NOT NULL," +
+                CoursesEntry.COLUMN_COURSE_NAME + " VARCHAR(100) NOT NULL" +
                 ");";
         db.execSQL(queryNotifications);
         db.execSQL(queryCourses);
@@ -50,6 +49,7 @@ public class ZotifyDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + NotificationEntry.TABLE_NAME + ";");
         db.execSQL("DROP TABLE IF EXISTS " + CoursesEntry.TABLE_NAME + ";");
+        Utilities.setCourseUpdatePref(mContext, 0);
         Utilities.setLastNotifIdPref(mContext, 0);
         onCreate(db);
         ZotifySyncAdapter.syncImmediately(mContext);

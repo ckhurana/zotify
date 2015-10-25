@@ -5,23 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.zuccessful.zotify.data.ZotifyContract;
-import com.zuccessful.zotify.sync.ZotifyMiscSyncAdapter;
 import com.zuccessful.zotify.sync.ZotifySyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         onFirstLaunch();
 
         ZotifySyncAdapter.initializeSyncAdapter(this);
-
     }
 
     @Override
@@ -120,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
         getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
         getContentResolver().delete(ZotifyContract.CoursesEntry.CONTENT_URI, null, null);
         Utilities.setLastNotifIdPref(this, 0);
+        Utilities.setCourseUpdatePref(this, 0);
         ZotifySyncAdapter.syncImmediately(this);
-        ZotifyMiscSyncAdapter.syncImmediately(this);
     }
 
     @Override

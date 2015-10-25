@@ -2,13 +2,17 @@ package com.zuccessful.zotify;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
+
+import com.zuccessful.zotify.data.ZotifyContract;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Vector;
 
 /**
  * Created by Chirag Khurana on 02-Sep-15.
@@ -67,6 +71,40 @@ public class Utilities {
         return inputTimestamp;
     }
 
+    public static CharSequence[] getCourseCodes(Context context){
+        Vector<String> v = new Vector<>();
+
+        Cursor cursor = context.getContentResolver().query(ZotifyContract.CoursesEntry.CONTENT_URI, null, null, null, null);
+
+        if(cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                v.add(cursor.getString(cursor.getColumnIndex(ZotifyContract.CoursesEntry.COLUMN_COURSE_CODE)));
+                cursor.moveToNext();
+            }
+        }
+        CharSequence[] cs = new CharSequence[v.size()];
+        v.toArray(cs);
+        return cs;
+    }
+
+    public static CharSequence[] getCourseNames(Context context){
+        Vector<String> v = new Vector<>();
+
+        Cursor cursor = context.getContentResolver().query(ZotifyContract.CoursesEntry.CONTENT_URI, null, null, null, null);
+
+        if(cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                v.add(cursor.getString(cursor.getColumnIndex(ZotifyContract.CoursesEntry.COLUMN_COURSE_NAME)));
+                cursor.moveToNext();
+            }
+        }
+        CharSequence[] cs = new CharSequence[v.size()];
+        v.toArray(cs);
+        return cs;
+    }
+
 
     public static void setActiveAppPref(Context context, boolean isActive){
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
@@ -111,6 +149,17 @@ public class Utilities {
     public static String getSuccessCodePref(Context context) {
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         return sp.getString(context.getString(R.string.success_code_sp), "1");
+    }
+
+    public static void setCourseUpdatePref(Context context, int count){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(context.getString(R.string.course_update), count);
+        editor.apply();
+    }
+    public static int getCourseUpdatePref(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getInt(context.getString(R.string.course_update), 0);
     }
 
 

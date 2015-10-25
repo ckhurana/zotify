@@ -40,6 +40,8 @@ import java.util.Vector;
  * Created by Chirag Khurana on 01-Sep-15.
  */
 public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
+
+    Context mContext = getContext();
     private static final String LOG_TAG = ZotifySyncAdapter.class.getSimpleName();
     public static final int ZOTIFY_NOTIFICATION_ID = 3105;
     // Interval at which to sync with the weather, in seconds.
@@ -146,15 +148,21 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(LOG_TAG, "Starting Sync");
+        if(Utilities.getCourseUpdatePref(mContext) % 10 == 0){
+            SyncUtilities.fetchJsonCourses(mContext);
+            Utilities.setCourseUpdatePref(mContext, 1);
+        }
+        Utilities.setCourseUpdatePref(mContext, Utilities.getCourseUpdatePref(mContext) + 1);
+
+        Log.d(LOG_TAG, "Starting Notifications Sync");
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
-        String notifyJsonStr = null;
+        String zotifyJsonStr = null;
 
         try {
-            final String NOTIFY_BASE_URL = getContext().getString(R.string.sync_url);
+            final String ZOTIFY_BASE_URL = getContext().getString(R.string.sync_url);
 
             String courseParam = "course=";
             String selectedCourse = Utilities.getPreferredCourse(getContext());
@@ -162,9 +170,9 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
             String lastIdParam = "lastId=";
             String lastId = Long.toString(Utilities.getLastNotifIdPref(getContext()));
 
-            String NOTIFY_URL = NOTIFY_BASE_URL + courseParam + selectedCourse + '&' + lastIdParam + lastId;
+            String ZOTIFY_URL = ZOTIFY_BASE_URL + courseParam + selectedCourse + '&' + lastIdParam + lastId;
 
-            URL url = new URL(NOTIFY_URL);
+            URL url = new URL(ZOTIFY_URL);
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -188,8 +196,8 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            notifyJsonStr = buffer.toString();
-            getNotificationsFromJson(notifyJsonStr);
+            zotifyJsonStr = buffer.toString();
+            getNotificationsFromJson(zotifyJsonStr);
 
         } catch (IOException e) {
             e.printStackTrace();

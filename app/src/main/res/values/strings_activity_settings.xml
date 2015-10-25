@@ -31,7 +31,7 @@
     <string name="pref_course_bcom_hons_1_value">bcom_h_1</string>
 
     <string name="pref_enable_notifications_key">enable_notifications</string>
-    <string name="pref_enable_notifications_title">Notify Notifications</string>
+    <string name="pref_enable_notifications_title">Zotify Notifications</string>
 
     <string name="pref_sync_freq_key">sync_frequency</string>
     <string name="pref_sync_freq_title">Sync Frequency</string>

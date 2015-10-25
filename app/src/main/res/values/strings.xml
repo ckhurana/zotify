@@ -6,6 +6,7 @@
 
     <!--Syncing Data Strings-->
     <string name="content_authority">com.zuccessful.zotify</string>
+    <string name="content_authority_courses">com.zuccessful.zotify</string>
     <string name="sync_account_type">zotify.zuccessful.com</string>
 
     <!--Menu Items Strings-->
@@ -22,6 +23,7 @@
     <string name="last_synced_notif">lastSyncedNotif</string>
     <string name="is_first_launch">isFirstLaunch</string>
     <string name="success_code_sp">savedSuccessCode</string>
+    <string name="course_update">courseUpdate</string>
 
     <!--Utility Strings-->
     <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>
@@ -35,6 +37,7 @@
     <string name="fail_reset_code">001</string>
 
     <string name="hello_world">Hello World!</string>
+    <string name="sync_courses_url">http://zuccessful.com/zotify/rc/courses.php</string>
 
 
 </resources>
