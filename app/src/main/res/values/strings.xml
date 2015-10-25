@@ -31,7 +31,7 @@
 
     <!--Misc Strings-->
     <string name="sync_url">"http://zuccessful.com/zotify/rc/notifications.php?</string>
-    <string name="addnotif_url">http://zuccessful.com/zotify/rc/addnotif.php</string>
+    <string name="addnotif_url">http://zuccessful.com/zotify/rc/addnotif.php?course=<xliff:g id="course">%1$s</xliff:g></string>
 
     <string name="success_reset_code">101</string>
     <string name="fail_reset_code">001</string>
