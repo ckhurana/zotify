@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(!isReCreated){
+            ZotifySyncAdapter.syncImmediately(this);
             int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
             if (mDefTabIndex != defTab) {
                 mDefTabIndex = defTab;

@@ -127,7 +127,7 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
 
             alert.setTitle("Delete");
-            alert.setMessage("Do you want delete this notification?");
+            alert.setMessage("Do you want to delete this notification?");
             alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

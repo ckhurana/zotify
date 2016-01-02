@@ -234,7 +234,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             JSONObject zotifyJson = new JSONObject(zotifyJsonStr);
 
-            //Check server msgs for database
+            //Check server's success msgs for database
             successCodeChanged(zotifyJson.getString(ZOTIFY_SUCCESS));
 
             JSONArray notificationsArray = zotifyJson.getJSONArray(ZOTIFY_NOTIFICATIONS);
