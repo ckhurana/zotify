@@ -151,8 +151,10 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         if(Utilities.getCourseUpdatePref(mContext) % 10 == 0){
             SyncUtilities.fetchJsonCourses(mContext);
             Utilities.setCourseUpdatePref(mContext, 1);
+        } else {
+            Utilities.setCourseUpdatePref(mContext, Utilities.getCourseUpdatePref(mContext) + 1);
         }
-        Utilities.setCourseUpdatePref(mContext, Utilities.getCourseUpdatePref(mContext) + 1);
+
 
         Log.d(LOG_TAG, "Starting Notifications Sync");
 
@@ -218,6 +220,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
     private void getNotificationsFromJson(String zotifyJsonStr) {
         final String ZOTIFY_SUCCESS = "success";
         final String ZOTIFY_MESSAGE = "message";
+        final String ZOTIFY_SESSION = "session";
         final String ZOTIFY_NOTIFICATIONS = "notifications";
         final String ZOTIFY_ID = "ID";
         final String ZOTIFY_COURSE = "course";
@@ -236,6 +239,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
             //Check server's success msgs for database
             successCodeChanged(zotifyJson.getString(ZOTIFY_SUCCESS));
+            sessionChanged(zotifyJson.getString(ZOTIFY_SESSION));
 
             JSONArray notificationsArray = zotifyJson.getJSONArray(ZOTIFY_NOTIFICATIONS);
 
@@ -296,7 +300,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         Context context = getContext();
         String savedCode = Utilities.getSuccessCodePref(context);
 
-        if (savedCode != code) {
+        if (!savedCode.equals(code)) {
             if (savedCode.equals(context.getString(R.string.fail_reset_code)) && code.equals("1")) {
                 Utilities.setSuccessCodePref(context, context.getString(R.string.success_reset_code));
             } else {
@@ -310,6 +314,24 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
                 Utilities.setLastNotifIdPref(context, 0);
                 syncImmediately(context);
+            }
+        }
+    }
+
+    private void sessionChanged(String session) {
+        Log.i(LOG_TAG, "Session from Server: " + session);
+        Context context = getContext();
+        String savedCode = Utilities.getSessionPref(context);
+
+        if(session != null) {
+            if (!savedCode.equals(session)) {
+                    Utilities.setSessionPref(context, session);
+                    Log.i(LOG_TAG, "Reset database due to session change");
+                    context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+                    context.getContentResolver().delete(ZotifyContract.CoursesEntry.CONTENT_URI, null, null);
+                    Utilities.setLastNotifIdPref(context, 0);
+                    Utilities.setCourseUpdatePref(context, 0);
+                    syncImmediately(context);
             }
         }
     }

@@ -151,6 +151,17 @@ public class Utilities {
         return sp.getString(context.getString(R.string.success_code_sp), "1");
     }
 
+    public static void setSessionPref(Context context, String session){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(context.getString(R.string.session_sp), session);
+        editor.apply();
+    }
+    public static String getSessionPref(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getString(context.getString(R.string.session_sp), "2015b");
+    }
+
     public static void setCourseUpdatePref(Context context, int count){
         SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();

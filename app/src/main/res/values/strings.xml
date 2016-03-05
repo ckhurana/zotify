@@ -23,6 +23,7 @@
     <string name="last_synced_notif">lastSyncedNotif</string>
     <string name="is_first_launch">isFirstLaunch</string>
     <string name="success_code_sp">savedSuccessCode</string>
+    <string name="session_sp">sessionMessage</string>
     <string name="course_update">courseUpdate</string>
 
     <!--Utility Strings-->
