@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -23,14 +24,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.zuccessful.zotify.data.ZotifyContract;
+import com.zuccessful.zotify.sync.ZotifySyncAdapter;
 
 /**
  * Created by Chirag Khurana on 29-Aug-15.
  */
-public class GeneralFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GeneralFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener{
 
     private ListView zotifyListView;
     public static ZotifyAdapter mZotifyAdapter;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     static final int COL_NOTIF_ID = 0;
     static final int COL_NOTIF_TYPE_NAME = 1;
@@ -134,6 +137,22 @@ public class GeneralFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
 
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        ZotifySyncAdapter.syncImmediately(getContext(), swipeRefreshLayout);
+                                    }
+                                }
+        );
+
         return view;
     }
 
@@ -157,5 +176,10 @@ public class GeneralFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //mZotifyAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onRefresh() {
+        ZotifySyncAdapter.syncImmediately(getContext(), swipeRefreshLayout);
     }
 }

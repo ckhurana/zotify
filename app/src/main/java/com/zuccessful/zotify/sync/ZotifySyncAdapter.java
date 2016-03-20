@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.zuccessful.zotify.MainActivity;
@@ -49,6 +50,8 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
     public static int SYNC_INTERVAL = 60 * 180;
     public static int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
+    private static boolean IS_DB_RESET = false;
+
 
     public ZotifySyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -65,6 +68,15 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
+    }
+
+    public static void syncImmediately(Context context, SwipeRefreshLayout srl) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+        srl.setRefreshing(false);
     }
 
     /**
@@ -313,6 +325,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.i(LOG_TAG, "Reset database on Server's Request");
                 context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
                 Utilities.setLastNotifIdPref(context, 0);
+                IS_DB_RESET = true;
                 syncImmediately(context);
             }
         }
@@ -331,6 +344,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                     context.getContentResolver().delete(ZotifyContract.CoursesEntry.CONTENT_URI, null, null);
                     Utilities.setLastNotifIdPref(context, 0);
                     Utilities.setCourseUpdatePref(context, 0);
+                    IS_DB_RESET = true;
                     syncImmediately(context);
             }
         }
@@ -338,10 +352,15 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void zotifyNotifs(int number) {
         Context context = getContext();
+        String contentText;
 
         if (Utilities.getPreferredNotificationSetting(context) && !Utilities.getActiveAppPref(context)) {
-            String contentText = String.format(context.getString(R.string.format_notification), number);
-
+            if(IS_DB_RESET){
+                contentText = "Database Reset by Server";
+                IS_DB_RESET = false;
+            } else {
+                contentText = String.format(context.getString(R.string.format_notification), number);
+            }
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_logo_base)
                     .setContentTitle(context.getString(R.string.app_name))
