@@ -1,5 +1,6 @@
 package com.zuccessful.zotify;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,21 +10,30 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.zuccessful.zotify.data.ZotifyContract;
+import com.zuccessful.zotify.sync.ZotifySyncAdapter;
 
 /**
  * Created by Chirag Khurana on 29-Aug-15.
  */
-public class GeneralFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GeneralFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener{
 
     private ListView zotifyListView;
     public static ZotifyAdapter mZotifyAdapter;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     static final int COL_NOTIF_ID = 0;
     static final int COL_NOTIF_TYPE_NAME = 1;
@@ -62,6 +72,87 @@ public class GeneralFragment extends Fragment implements LoaderManager.LoaderCal
 
             }
         });
+
+        zotifyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        zotifyListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                final int checkedCount = zotifyListView.getCheckedItemCount();
+                mode.setTitle(checkedCount + " Selected");
+                mZotifyAdapter.toggleSelection(position);
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                mode.getMenuInflater().inflate(R.menu.menu_selection, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.delete_items:
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+
+                        alert.setTitle("Delete");
+                        alert.setMessage("Do you want to delete the selected notification(s)?");
+                        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri uri;
+                                SparseBooleanArray selected = mZotifyAdapter.getmSelectedItemsIds();
+                                for (int i = selected.size() - 1; i >= 0; i--) {
+                                    if (selected.valueAt(i)) {
+                                        Cursor cursor = (Cursor) mZotifyAdapter.getItem(selected.keyAt(i));
+                                        uri = ZotifyContract.NotificationEntry.buildNotifyUriWithId(cursor.getLong(COL_NOTIF_ID));
+                                        mZotifyAdapter.remove(uri);
+                                    }
+                                }
+                                getLoaderManager().restartLoader(ZOTIFY_LOADER, null, GeneralFragment.this);
+                                mode.finish();
+                            }
+                        });
+                        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        alert.show();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                mZotifyAdapter.removeSelection();
+            }
+        });
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        ZotifySyncAdapter.syncImmediately(getContext(), swipeRefreshLayout);
+                                    }
+                                }
+        );
+
         return view;
     }
 
@@ -84,6 +175,11 @@ public class GeneralFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mZotifyAdapter.swapCursor(null);
+        //mZotifyAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onRefresh() {
+        ZotifySyncAdapter.syncImmediately(getContext(), swipeRefreshLayout);
     }
 }

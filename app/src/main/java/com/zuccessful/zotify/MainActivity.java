@@ -1,7 +1,11 @@
 package com.zuccessful.zotify;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.zuccessful.zotify.data.ZotifyContract;
 import com.zuccessful.zotify.sync.ZotifySyncAdapter;
@@ -19,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static int mDefTabIndex = 0;
     private static String mDefCourse;
+    public static boolean isReCreated = false;         //for setting up correct tab
     Toolbar toolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -28,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mDefCourse = Utilities.getPreferredCourse(this);
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
@@ -44,9 +52,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        viewPager.setCurrentItem(mDefTabIndex);
 
-        mDefCourse = Utilities.getPreferredCourse(this);
+        onFirstLaunch();
 
         ZotifySyncAdapter.initializeSyncAdapter(this);
     }
@@ -55,13 +62,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Utilities.setActiveAppPref(this, true);
+        clearNotifs();
         onPreferenceChanged();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Utilities.setActiveAppPref(this, false);
+    public void onFirstLaunch(){
+        if(Utilities.getFirstLaunchPref(this)){
+            Utilities.setFirstLaunchPref(this, false);
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            sp.edit().putString(getString(R.string.pref_course_key), getString(R.string.pref_course_btech_cs_value)).apply();
+            resetData();
+
+            Toast.makeText(MainActivity.this, "Select your Preferred Course from the App Settings", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void clearNotifs(){
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(ZotifySyncAdapter.ZOTIFY_NOTIFICATION_ID);
     }
 
     public void onPreferenceChanged() {
@@ -73,11 +91,16 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
 
-        int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
-        if (mDefTabIndex != defTab) {
-            mDefTabIndex = defTab;
-            viewPager.setCurrentItem(mDefTabIndex);
+
+        if(!isReCreated){
+            ZotifySyncAdapter.syncImmediately(this);
+            int defTab = Integer.valueOf(Utilities.getPreferredTab(this));
+            if (mDefTabIndex != defTab) {
+                mDefTabIndex = defTab;
+            }
+            isReCreated = true;
         }
+        viewPager.setCurrentItem(mDefTabIndex);
 
 
         String defCourse = Utilities.getPreferredCourse(this);
@@ -87,6 +110,21 @@ public class MainActivity extends AppCompatActivity {
             Utilities.setLastNotifIdPref(this, 0);
             ZotifySyncAdapter.syncImmediately(this);
         }
+    }
+
+    public void resetData(){
+        getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+        getContentResolver().delete(ZotifyContract.CoursesEntry.CONTENT_URI, null, null);
+        Utilities.setLastNotifIdPref(this, 0);
+        Utilities.setCourseUpdatePref(this, 0);
+        ZotifySyncAdapter.syncImmediately(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDefTabIndex = viewPager.getCurrentItem();
+        Utilities.setActiveAppPref(this, false);
     }
 
     @Override
@@ -112,9 +150,7 @@ public class MainActivity extends AppCompatActivity {
             ZotifySyncAdapter.syncImmediately(this);
         }
         if (id == R.id.action_reset) {
-            getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
-            Utilities.setLastNotifIdPref(this, 0);
-            ZotifySyncAdapter.syncImmediately(this);
+            resetData();
         }
 
         return super.onOptionsItemSelected(item);

@@ -43,13 +43,6 @@ public class DetailsActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
         }
-
-//        if (id == R.id.delete_item) {
-//            getContentResolver().delete(getIntent().getData(), null, null);
-//            NavUtils.navigateUpFromSameTask(this);
-//            return true;
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 }

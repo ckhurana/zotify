@@ -6,6 +6,7 @@
 
     <!--Syncing Data Strings-->
     <string name="content_authority">com.zuccessful.zotify</string>
+    <string name="content_authority_courses">com.zuccessful.zotify</string>
     <string name="sync_account_type">zotify.zuccessful.com</string>
 
     <!--Menu Items Strings-->
@@ -16,18 +17,28 @@
     <string name="delete_item">Delete</string>
 
     <!--Shared Preferences Files Strings-->
-    <string name="active_app_pref_key">com.zuccessful.zotify.APP_ACTIVE</string>
-    <string name="is_app_active">isActive</string>
+    <string name="utilities_pref_key">com.zuccessful.zotify.UTILITIES_PREF</string>
 
-    <string name="last_notif_id_key">com.zuccessful.zotify.LAST_ID</string>
-    <string name="last_notif_id_value">lastIdValue</string>
+    <string name="is_app_foreground">isForeground</string>
+    <string name="last_synced_notif">lastSyncedNotif</string>
+    <string name="is_first_launch">isFirstLaunch</string>
+    <string name="success_code_sp">savedSuccessCode</string>
+    <string name="session_sp">sessionMessage</string>
+    <string name="course_update">courseUpdate</string>
 
     <!--Utility Strings-->
     <string name="format_notification">You have <xliff:g id="count">%1$s</xliff:g> new notification(s).</string>
     <string name="format_date_type"><xliff:g id="timeStamp">%1$s</xliff:g> - <xliff:g id="type">%2$s</xliff:g></string>
 
     <!--Misc Strings-->
-    <string name="addnotif_url">http://zuccessful.cu.cc/notify/addnotif</string>
-    <string name="hello_world">Placeholder</string>
+    <string name="sync_url">"http://zuccessful.com/zotify/rc/notifications.php?</string>
+    <string name="addnotif_url">http://zuccessful.com/zotify/rc/addnotif.php?course=<xliff:g id="course">%1$s</xliff:g></string>
+
+    <string name="success_reset_code">101</string>
+    <string name="fail_reset_code">001</string>
+
+    <string name="hello_world">Hello World!</string>
+    <string name="sync_courses_url">http://zuccessful.com/zotify/rc/courses.php</string>
+
 
 </resources>

@@ -11,6 +11,8 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,13 +31,15 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
     static final int COL_NOTIF_PRIORITY = 3;
     static final int COL_NOTIF_DESC = 4;
     static final int COL_NOTIF_TIME = 5;
+    static final int COL_NOTIF_AUTHOR = 6;
     static final String[] DETAILS_COLUMNS = {
             ZotifyContract.NotificationEntry._ID,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_TYPE_NAME,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_TITLE,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_PRIORITY,
             ZotifyContract.NotificationEntry.COLUMN_NOTIF_DESC,
-            ZotifyContract.NotificationEntry.COLUMN_NOTIF_TIME
+            ZotifyContract.NotificationEntry.COLUMN_NOTIF_TIME,
+            ZotifyContract.NotificationEntry.COLUMN_NOTIF_AUTHOR
     };
     private static final int DETAIL_LOADER = 0;
 
@@ -83,25 +87,27 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
         TextView priorityView = (TextView) getView().findViewById(R.id.priority_text_view);
         TextView descView = (TextView) getView().findViewById(R.id.desc_view);
         TextView timeView = (TextView) getView().findViewById(R.id.time_text);
+        TextView authorView = (TextView) getView().findViewById(R.id.author_text);
 
         String title = data.getString(COL_NOTIF_TITLE);
         String desc = data.getString(COL_NOTIF_DESC);
         String priority = Utilities.getPriorityString(data.getString(COL_NOTIF_PRIORITY));
         String type = data.getString(COL_NOTIF_TYPE_NAME);
         String timeStr = data.getString(COL_NOTIF_TIME);
+        String author = data.getString(COL_NOTIF_AUTHOR);
 
-        timeStr = Utilities.timeZoneDetailView(timeStr);
+        timeStr = Utilities.timeNormalized(timeStr, false);
 
         titleView.setText(title);
         descView.setText(desc);
         priorityView.setText(priority);
         typeView.setText(type);
         timeView.setText(timeStr);
+        authorView.setText(author);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 
     @Override
@@ -118,11 +124,10 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
 
             final Uri uri = getActivity().getIntent().getData();
 
-
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
 
             alert.setTitle("Delete");
-            alert.setMessage("Do you want delete this item?");
+            alert.setMessage("Do you want to delete this notification?");
             alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -137,7 +142,6 @@ public class DetailsActivityFragment extends Fragment implements LoaderManager.L
                 }
             });
             alert.show();
-
 
             return true;
         }

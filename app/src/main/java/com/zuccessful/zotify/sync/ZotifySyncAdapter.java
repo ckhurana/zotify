@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.zuccessful.zotify.MainActivity;
@@ -40,12 +41,16 @@ import java.util.Vector;
  * Created by Chirag Khurana on 01-Sep-15.
  */
 public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
+
+    Context mContext = getContext();
     private static final String LOG_TAG = ZotifySyncAdapter.class.getSimpleName();
-    private static final int ZOTIFY_NOTIFICATION_ID = 3105;
+    public static final int ZOTIFY_NOTIFICATION_ID = 3105;
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
     public static int SYNC_INTERVAL = 60 * 180;
     public static int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+
+    private static boolean IS_DB_RESET = false;
 
 
     public ZotifySyncAdapter(Context context, boolean autoInitialize) {
@@ -63,6 +68,15 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
+    }
+
+    public static void syncImmediately(Context context, SwipeRefreshLayout srl) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+        srl.setRefreshing(false);
     }
 
     /**
@@ -146,15 +160,23 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(LOG_TAG, "Starting Sync");
+        if(Utilities.getCourseUpdatePref(mContext) % 10 == 0){
+            SyncUtilities.fetchJsonCourses(mContext);
+            Utilities.setCourseUpdatePref(mContext, 1);
+        } else {
+            Utilities.setCourseUpdatePref(mContext, Utilities.getCourseUpdatePref(mContext) + 1);
+        }
+
+
+        Log.d(LOG_TAG, "Starting Notifications Sync");
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
-        String notifyJsonStr = null;
+        String zotifyJsonStr = null;
 
         try {
-            final String NOTIFY_BASE_URL = "http://zuccessful.cu.cc/notify/notifs/index.php?";
+            final String ZOTIFY_BASE_URL = getContext().getString(R.string.sync_url);
 
             String courseParam = "course=";
             String selectedCourse = Utilities.getPreferredCourse(getContext());
@@ -162,12 +184,14 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
             String lastIdParam = "lastId=";
             String lastId = Long.toString(Utilities.getLastNotifIdPref(getContext()));
 
-            String NOTIFY_URL = NOTIFY_BASE_URL + courseParam + selectedCourse + '&' + lastIdParam + lastId;
+            String ZOTIFY_URL = ZOTIFY_BASE_URL + courseParam + selectedCourse + '&' + lastIdParam + lastId;
 
-            URL url = new URL(NOTIFY_URL);
+            URL url = new URL(ZOTIFY_URL);
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
+//            urlConnection.setConnectTimeout(5000);
+//            urlConnection.setReadTimeout(10000);
             urlConnection.connect();
 
             InputStream inputStream = urlConnection.getInputStream();
@@ -186,8 +210,8 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            notifyJsonStr = buffer.toString();
-            getNotificationsFromJson(notifyJsonStr);
+            zotifyJsonStr = buffer.toString();
+            getNotificationsFromJson(zotifyJsonStr);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -208,11 +232,13 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
     private void getNotificationsFromJson(String zotifyJsonStr) {
         final String ZOTIFY_SUCCESS = "success";
         final String ZOTIFY_MESSAGE = "message";
+        final String ZOTIFY_SESSION = "session";
         final String ZOTIFY_NOTIFICATIONS = "notifications";
         final String ZOTIFY_ID = "ID";
         final String ZOTIFY_COURSE = "course";
         final String ZOTIFY_TYPE = "type";
         final String ZOTIFY_TYPE_NAME = "type_name";
+        final String ZOTIFY_AUTHOR = "author";
         final String ZOTIFY_TITLE = "title";
         final String ZOTIFY_DESCRIPTION = "description";
         final String ZOTIFY_PRIORITY = "priority";
@@ -222,6 +248,11 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             JSONObject zotifyJson = new JSONObject(zotifyJsonStr);
+
+            //Check server's success msgs for database
+            successCodeChanged(zotifyJson.getString(ZOTIFY_SUCCESS));
+            sessionChanged(zotifyJson.getString(ZOTIFY_SESSION));
+
             JSONArray notificationsArray = zotifyJson.getJSONArray(ZOTIFY_NOTIFICATIONS);
 
             Vector<ContentValues> cVector = new Vector<ContentValues>(notificationsArray.length());
@@ -232,12 +263,13 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
                 long id = notificationObject.getInt(ZOTIFY_ID);
 
-                if(id > lastScannedId)
+                if (id > lastScannedId)
                     lastScannedId = id;
 
                 String course = notificationObject.getString(ZOTIFY_COURSE);
                 String type = notificationObject.getString(ZOTIFY_TYPE);
                 String type_name = notificationObject.getString(ZOTIFY_TYPE_NAME);
+                String author = notificationObject.getString(ZOTIFY_AUTHOR);
                 String title = notificationObject.getString(ZOTIFY_TITLE);
                 String description = notificationObject.getString(ZOTIFY_DESCRIPTION);
                 String priority = notificationObject.getString(ZOTIFY_PRIORITY);
@@ -247,6 +279,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_COURSE, course);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_TYPE, type);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_TYPE_NAME, type_name);
+                values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_AUTHOR, author);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_TITLE, title);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_DESC, description);
                 values.put(ZotifyContract.NotificationEntry.COLUMN_NOTIF_PRIORITY, priority);
@@ -274,12 +307,60 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    private void successCodeChanged(String code) {
+        Log.i(LOG_TAG, "Success code from Server: " + code);
+        Context context = getContext();
+        String savedCode = Utilities.getSuccessCodePref(context);
+
+        if (!savedCode.equals(code)) {
+            if (savedCode.equals(context.getString(R.string.fail_reset_code)) && code.equals("1")) {
+                Utilities.setSuccessCodePref(context, context.getString(R.string.success_reset_code));
+            } else {
+                Utilities.setSuccessCodePref(context, code);
+            }
+
+            if (!(savedCode.equals(context.getString(R.string.success_reset_code)) || savedCode.equals(context.getString(R.string.fail_reset_code))) &&
+                    (code.equals(context.getString(R.string.success_reset_code))
+                            || code.equals(context.getString(R.string.fail_reset_code)))) {
+                Log.i(LOG_TAG, "Reset database on Server's Request");
+                context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+                Utilities.setLastNotifIdPref(context, 0);
+                IS_DB_RESET = true;
+                syncImmediately(context);
+            }
+        }
+    }
+
+    private void sessionChanged(String session) {
+        Log.i(LOG_TAG, "Session from Server: " + session);
+        Context context = getContext();
+        String savedCode = Utilities.getSessionPref(context);
+
+        if(session != null) {
+            if (!savedCode.equals(session)) {
+                    Utilities.setSessionPref(context, session);
+                    Log.i(LOG_TAG, "Reset database due to session change");
+                    context.getContentResolver().delete(ZotifyContract.NotificationEntry.CONTENT_URI, null, null);
+                    context.getContentResolver().delete(ZotifyContract.CoursesEntry.CONTENT_URI, null, null);
+                    Utilities.setLastNotifIdPref(context, 0);
+                    Utilities.setCourseUpdatePref(context, 0);
+                    IS_DB_RESET = true;
+                    syncImmediately(context);
+            }
+        }
+    }
+
     private void zotifyNotifs(int number) {
         Context context = getContext();
+        String contentText;
 
         if (Utilities.getPreferredNotificationSetting(context) && !Utilities.getActiveAppPref(context)) {
-            String contentText = String.format(context.getString(R.string.format_notification), number);
-
+            if(IS_DB_RESET){
+                contentText = "Database Reset by Server";
+                IS_DB_RESET = false;
+            } else {
+                contentText = String.format(context.getString(R.string.format_notification), number);
+            }
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_logo_base)
                     .setContentTitle(context.getString(R.string.app_name))
@@ -303,6 +384,7 @@ public class ZotifySyncAdapter extends AbstractThreadedSyncAdapter {
 
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(ZOTIFY_NOTIFICATION_ID, mBuilder.build());
+
         }
     }
 }

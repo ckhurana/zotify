@@ -6,6 +6,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -26,6 +27,22 @@ public class SettingsActivity extends PreferenceActivity
         super.onCreate(savedInstanceState);
         // Add 'general' preferences, defined in the XML file
         addPreferencesFromResource(R.xml.pref_general);
+
+        CharSequence[] entries = Utilities.getCourseNames(this);
+        CharSequence[] entryValues = Utilities.getCourseCodes(this);
+        ListPreference lp = (ListPreference) findPreference(getString(R.string.pref_course_key));
+        if(entries == null || entryValues == null) {
+            lp.setEnabled(false);
+        } else {
+            lp.setEnabled(true);
+            lp.setEntries(entries);
+            lp.setEntryValues(entryValues);
+            if(lp.getValue() == null){
+                lp.setValue(entryValues[0].toString());
+            }
+        }
+
+
 
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
@@ -49,7 +66,6 @@ public class SettingsActivity extends PreferenceActivity
             }
         });
     }
-
 
     /**
      * Attaches a listener so the summary is always updated with the preference value.

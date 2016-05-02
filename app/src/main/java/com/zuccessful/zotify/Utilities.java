@@ -2,13 +2,17 @@ package com.zuccessful.zotify;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
+
+import com.zuccessful.zotify.data.ZotifyContract;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Vector;
 
 /**
  * Created by Chirag Khurana on 02-Sep-15.
@@ -29,71 +33,148 @@ public class Utilities {
         return priority;
     }
 
-    public static String timeZonedList(String dateTime){
-
-        Date currDate = new Date();
-        String currDateStr, enteredDate = dateTime;
+    public static String timeNormalized(String inputTimestamp, boolean isListView){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        if(isListView){
+            try {
+                Date currDate = new Date();
 
-        try {
-            Date date = sdf.parse(dateTime);
-            sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+                Date date = sdf.parse(inputTimestamp);
 
-            currDateStr = sdf.format(currDate);
-            enteredDate =  sdf.format(date);
+                sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+                inputTimestamp = sdf.format(date);
+                String currDateStr = sdf.format(currDate);
 
-            if(currDateStr.equals(enteredDate)){
-                sdf = new SimpleDateFormat("hh:mm a", Locale.US);
-                return sdf.format(date);
-            }else {
-                sdf = new SimpleDateFormat("MMM d", Locale.US);
-                return sdf.format(date);
+
+                if(currDateStr.equals(inputTimestamp)){
+                    sdf = new SimpleDateFormat("hh:mm a", Locale.US);
+                    return sdf.format(date);
+                }else {
+                    sdf = new SimpleDateFormat("MMM d", Locale.US);
+                    return sdf.format(date);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } else {
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+            try {
+                Date date = sdf.parse(inputTimestamp);
+                sdf = new SimpleDateFormat("MMM d, HH:mm", Locale.US);
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+                inputTimestamp = sdf.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-        return dateTime;
-
+        return inputTimestamp;
     }
 
-    public static String timeZoneDetailView(String timeStr){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        try {
-            Date date = sdf.parse(timeStr);
-            sdf = new SimpleDateFormat("MMM d, HH:mm", Locale.ENGLISH);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
-            timeStr = sdf.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+    public static CharSequence[] getCourseCodes(Context context){
+        Vector<String> v = new Vector<>();
+
+        Cursor cursor = context.getContentResolver().query(ZotifyContract.CoursesEntry.CONTENT_URI, null, null, null, null);
+
+        if(cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                v.add(cursor.getString(cursor.getColumnIndex(ZotifyContract.CoursesEntry.COLUMN_COURSE_CODE)));
+                cursor.moveToNext();
+            }
         }
-        return timeStr;
+        CharSequence[] cs = new CharSequence[v.size()];
+        v.toArray(cs);
+        return cs;
     }
+
+    public static CharSequence[] getCourseNames(Context context){
+        Vector<String> v = new Vector<>();
+
+        Cursor cursor = context.getContentResolver().query(ZotifyContract.CoursesEntry.CONTENT_URI, null, null, null, null);
+
+        if(cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                v.add(cursor.getString(cursor.getColumnIndex(ZotifyContract.CoursesEntry.COLUMN_COURSE_NAME)));
+                cursor.moveToNext();
+            }
+        }
+        CharSequence[] cs = new CharSequence[v.size()];
+        v.toArray(cs);
+        return cs;
+    }
+
 
     public static void setActiveAppPref(Context context, boolean isActive){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.active_app_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putBoolean(context.getString(R.string.is_app_active), isActive);
+        editor.putBoolean(context.getString(R.string.is_app_foreground), isActive);
         editor.apply();
     }
 
     public static boolean getActiveAppPref(Context context){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.active_app_pref_key), Context.MODE_PRIVATE);
-        return sp.getBoolean(context.getString(R.string.is_app_active), false);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getBoolean(context.getString(R.string.is_app_foreground), false);
     }
 
     public static void setLastNotifIdPref(Context context, long id){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.last_notif_id_key), Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putLong(context.getString(R.string.last_notif_id_value), id);
+        editor.putLong(context.getString(R.string.last_synced_notif), id);
         editor.apply();
     }
     public static long getLastNotifIdPref(Context context){
-        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.last_notif_id_key), Context.MODE_PRIVATE);
-        return sp.getLong(context.getString(R.string.last_notif_id_value), 0);
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getLong(context.getString(R.string.last_synced_notif), 0);
     }
+
+    public static void setFirstLaunchPref(Context context, boolean isFirst){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(context.getString(R.string.is_first_launch), isFirst);
+        editor.apply();
+    }
+    public static boolean getFirstLaunchPref(Context context){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getBoolean(context.getString(R.string.is_first_launch), true);
+    }
+
+    public static void setSuccessCodePref(Context context, String code){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(context.getString(R.string.success_code_sp), code);
+        editor.apply();
+    }
+    public static String getSuccessCodePref(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getString(context.getString(R.string.success_code_sp), "1");
+    }
+
+    public static void setSessionPref(Context context, String session){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(context.getString(R.string.session_sp), session);
+        editor.apply();
+    }
+    public static String getSessionPref(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getString(context.getString(R.string.session_sp), "2015b");
+    }
+
+    public static void setCourseUpdatePref(Context context, int count){
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(context.getString(R.string.course_update), count);
+        editor.apply();
+    }
+    public static int getCourseUpdatePref(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(context.getString(R.string.utilities_pref_key), Context.MODE_PRIVATE);
+        return sp.getInt(context.getString(R.string.course_update), 0);
+    }
+
+
+    // --------- Setting's Default Shared Preferences ----------
 
     public static String getPreferredFreq(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
